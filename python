@@ -1,0 +1,40 @@
+#!/bin/sh
+
+which python > /dev/null 2>&1
+PY=$?
+which python2 > /dev/null 2>&1
+PY2=$?
+which python3 > /dev/null 2>&1
+PY3=$?
+
+INP=$@
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd | tr -d '\n' && echo "/python" )
+
+if [ $PY -eq 0 ] || [ $PY2 -eq 0 ] || [ $PY3 -eq 0 ]
+then
+    if [ -f $SCRIPT_DIR ]
+    then
+        rm $SCRIPT_DIR
+    fi
+
+    if [ $PY -eq 0 ]
+    then
+        ln -s $(which python) $SCRIPT_DIR
+
+    elif [ $PY2 -eq 0 ] && [ $PY3 -eq 0 ]
+    then
+        POSITIONS=( "python2" "python3" )
+        COLLAPSE=${POSITIONS[$[$RANDOM % 2]]}
+        ln -s $(which ${COLLAPSE}) $SCRIPT_DIR
+
+    elif [ $PY2 -eq 0 ]
+    then
+        ln -s $(which python2) $SCRIPT_DIR
+
+    elif [ $PY3 -eq 0 ]
+    then
+        ln -s $(which python3) $SCRIPT_DIR
+    fi
+    $SCRIPT_DIR $INP
+fi
